@@ -324,7 +324,10 @@ elif page == "Video Analysis":
                 st.caption("The model classifies sampled whole frames. Aerial footage may not show the close-up features the model learned.")
 
                 timestamps = [duration * i / sample_count for i in range(sample_count)] if duration > 0 and frame_count > 0 else []
+                if not timestamps:
+                    st.warning("This video does not report a usable frame count or frame rate, so no frames could be sampled for analysis.")
                 predictions, previews = [], []
+                unread_frames = 0
                 progress_bar = st.progress(0, text="Preparing video frames...")
                 model = load_rice_model()
 
@@ -351,8 +354,12 @@ elif page == "Video Analysis":
                             previews.append({"timestamp": timestamp, "image": rgb, "variety": best_name, "confidence": confidence, "top_five": top_five})
                         except Exception as prediction_error:
                             st.warning(f"Could not classify frame at {timestamp:.1f}s: {prediction_error}")
+                    else:
+                        unread_frames += 1
                     progress_bar.progress((index + 1) / max(1, len(timestamps)), text=f"Analysing frame {index + 1} of {len(timestamps)}...")
                 progress_bar.empty()
+                if unread_frames:
+                    st.warning(f"{unread_frames} of {len(timestamps)} sampled frames could not be read from this video (it may be damaged or truncated). Results use only the frames that could be read.")
 
                 if predictions:
                     df = pd.DataFrame(predictions)
