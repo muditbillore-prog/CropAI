@@ -177,6 +177,24 @@ A new model was trained on the stricter split with the same settings (YOLO11n-cl
 
 This is the more realistic estimate, but it still measures photos taken in the same sittings as the training photos: 34 test images still have a near-identical training image, and the results say nothing about other days, fields, cameras or lighting. With 288 test images the 95% interval is about +/-4 percentage points if images were independent; they are not, so the real uncertainty is larger, and some varieties have as few as 5 test images. The dashboard still uses `models/best.pt`, the model from the original split.
 
+### Where the Time-Ordered Model Fails
+
+`analyze_test_errors.py` (with `--model` and `--dataset`) lists the misclassified test images and a per-variety summary. Of the 33 varieties, 23 are classified perfectly and 10 have at least one error. Five varieties account for 37 of the 48 errors, and each of them is predicted almost entirely as one other variety:
+
+| True variety | Correct | Mostly predicted as |
+|---|---:|---|
+| bhujni | 0 / 9 | gobind bhog (9) |
+| laisiring | 0 / 9 | mega dambru (9) |
+| nua dhusri | 0 / 8 | bhata mali (7) |
+| radha jugal | 1 / 7 | mega dambru (6) |
+| nua kalajeera | 0 / 5 | nallu kondam (5) |
+
+The other 11 errors come from thoyamalli (4 of 9 correct; 4 of its 5 errors are predictions of chetan), bhata mali (7 of 9), kujiputliya (7 of 9), gori kalpi (8 of 9) and tonagapu samba (8 of 9).
+
+Each variety has only 5 to 9 test images taken in one consecutive block, so results are close to all-or-nothing per variety. The effective number of independent test blocks is closer to 33 than to 288, and the confidence interval quoted above is therefore optimistic.
+
+The cause has not been established. A simple check compared the average colour (mean RGB) of each variety's test photos with its training photos. The five failing varieties had colour shifts of 7 to 33 (RGB distance, 0-255 scale), against a median of 9.8 for the 23 perfect varieties, which include shifts as large as 39.4. A colour shift alone therefore neither explains nor predicts the failures, although the measure cannot see grain shape or texture. Possible explanations, none of them tested, are genuine visual similarity between varieties and differences between the start and end of a sitting that average colour does not capture.
+
 ### Running the Evaluation
 
 Activate the project virtual environment and execute:
@@ -259,20 +277,40 @@ Potential improvements include:
 
 ## 12. Repository Structure
 
+| File | Purpose |
+|---|---|
+| `app.py` | Streamlit dashboard |
+| `clean_rice_dataset.py` | Removes duplicates and conflicting labels from the raw dataset and makes the random split (v1) |
+| `make_time_ordered_split.py` | Builds the time-ordered split (v2) |
+| `train_rice_classifier.py` | Trains the classifier (`--dataset`, `--run-name`) |
+| `evaluate_rice_classifier.py` | Evaluates a model on a test split (`--model`, `--dataset`, `--name`) |
+| `analyze_test_errors.py` | Per-variety accuracy and most common confusions |
+| `check_split_leakage.py` | Measures how similar test images are to training images |
+| `tests/` | Unit and smoke tests: `python -m unittest discover -s tests` |
+
 ```text
 CropAI/
 ├── app.py
 ├── requirements.txt
 ├── train_rice_classifier.py
 ├── evaluate_rice_classifier.py
+├── analyze_test_errors.py
+├── check_split_leakage.py
+├── clean_rice_dataset.py
+├── make_time_ordered_split.py
 ├── models/
 │   └── best.pt
+├── tests/
+│   ├── test_maturity.py
+│   └── test_model_smoke.py
 ├── docs/
 │   ├── MODEL_DOCUMENTATION.md
 │   └── images/
-│       └── confusion_matrix_test.png
-└── datasets/
-    └── rice_classification_clean_v1/
+│       ├── confusion_matrix_test.png
+│       └── confusion_matrix_test_time_split.png
+└── datasets/            (local only, not in the repository)
+    ├── rice_classification_clean_v1/
+    └── rice_classification_time_split_v2/
 ```
 
 The dataset and local training artifacts are excluded from the GitHub repository.
