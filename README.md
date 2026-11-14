@@ -40,27 +40,35 @@ On Linux or macOS, activate the environment with `source .venv/bin/activate` ins
 
 ## Evaluation Results
 
-The model was evaluated on a held-out test split of 324 images across 33 classes that were not used for training or validation.
+Two evaluations are reported. The second is stricter and is the more realistic estimate; the first is kept because it is how the deployed model was originally measured.
 
-| Metric | Result |
-| --- | --- |
-| Independent test Top-1 accuracy | 99.07% |
-| Independent test Top-5 accuracy | 100.00% |
-| Test images | 324 |
-| Classes | 33 |
+| Evaluation | Model | Test images | Top-1 | Top-5 |
+| --- | --- | ---: | ---: | ---: |
+| Random split (original) | `models/best.pt` (used by the dashboard) | 324 | 99.07% | 100.00% |
+| Time-ordered split (stricter) | model trained on the time-ordered split | 288 | 83.33% | 94.44% |
 
-Validation accuracy (99.669% Top-1) is a separate measurement taken during training and is not the test result.
+**Why the first number is misleading.** Each variety was photographed in one short sitting and the original split was random. A similarity check (64-bit difference hash) found that 193 of the 324 test images have a near-identical training image of the same variety. Accuracy was 100% on the 304 test images with a close training neighbour (hash distance up to 15) and 85% (17 of 20) on the 20 distinct ones, so 99.07% overstates how well the model handles photos it has not effectively seen.
 
-![Normalized confusion matrix on the independent test set](docs/images/confusion_matrix_test.png)
+**The stricter split.** `make_time_ordered_split.py` sorts each variety's images by the capture time in the file name and cuts them into consecutive train, validation and test blocks, dropping a few images (a buffer of 6) between blocks. Test images with a near-identical training image fall from 193 of 324 to 34 of 288. A model trained on this split scores 87.0% Top-1 on validation and 83.33% on the test set.
 
-Full methodology, dataset details and training configuration are in [docs/MODEL_DOCUMENTATION.md](docs/MODEL_DOCUMENTATION.md). The test evaluation can be reproduced with `evaluate_rice_classifier.py`, provided the dataset is available locally.
+**What this still does not show.** Both evaluations use photos from the same sittings as the training photos, so neither measures performance on other days, fields, cameras or lighting. A truly independent test would need new photographs. The 288-image test set gives roughly ±4 percentage points of uncertainty if images were independent, which they are not, so the real uncertainty is larger, and some varieties have as few as 5 test images.
+
+![Normalized confusion matrix on the time-ordered test set](docs/images/confusion_matrix_test_time_split.png)
+
+Full methodology, the overlap analysis and the training configuration are in [docs/MODEL_DOCUMENTATION.md](docs/MODEL_DOCUMENTATION.md). To reproduce, with the dataset available locally:
+
+    python evaluate_rice_classifier.py
+    python check_split_leakage.py
+    python make_time_ordered_split.py --buffer 6 --write
+    python train_rice_classifier.py --dataset rice_classification_time_split_v2 --run-name rice_variety_time_split_v2
+    python evaluate_rice_classifier.py --model runs/rice_classification/rice_variety_time_split_v2/weights/best.pt --dataset rice_classification_time_split_v2
 
 ## Limitations
 
 - CropAI classifies the rice variety shown in an image. It does not detect individual plants.
 - It does not diagnose crop disease or provide a validated crop-health score.
 - Video analysis works on sampled frames and is not a field-level survey.
-- All reported accuracy comes from a held-out split of a single dataset. Performance on other fields, cameras, lighting or growth stages has not been measured.
+- Each variety was photographed in one short sitting, so all reported accuracy measures performance on similar photos, not on other fields, cameras, lighting or growth stages. The original 99.07% result also overlaps with the training photos; see Evaluation Results.
 - Model confidence scores are predictions, not guarantees of real-world accuracy.
 
 ## Development Status
