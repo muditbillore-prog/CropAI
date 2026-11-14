@@ -1,14 +1,22 @@
 
+import argparse
 from pathlib import Path
 from ultralytics import YOLO
 
 # Project paths
 PROJECT_ROOT = Path(__file__).resolve().parent
 
-DATASET_DIR = PROJECT_ROOT / "datasets" / "rice_classification_clean_v1"
+parser = argparse.ArgumentParser(description="Train the CropAI rice classifier.")
+parser.add_argument("--dataset", default="rice_classification_clean_v1",
+                    help="folder name under datasets/ (default: the original random split)")
+parser.add_argument("--run-name", default="rice_variety_clean_v1",
+                    help="name of the new training run under runs/rice_classification/")
+args = parser.parse_args()
+
+DATASET_DIR = PROJECT_ROOT / "datasets" / args.dataset
 PROJECT_DIR = PROJECT_ROOT / "runs" / "rice_classification"
 
-RUN_NAME = "rice_variety_clean_v1"
+RUN_NAME = args.run_name
 
 # Safety checks
 for split in ("train", "val", "test"):
