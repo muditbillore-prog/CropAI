@@ -195,6 +195,21 @@ Each variety has only 5 to 9 test images taken in one consecutive block, so resu
 
 The cause has not been established. A simple check compared the average colour (mean RGB) of each variety's test photos with its training photos. The five failing varieties had colour shifts of 7 to 33 (RGB distance, 0-255 scale), against a median of 9.8 for the 23 perfect varieties, which include shifts as large as 39.4. A colour shift alone therefore neither explains nor predicts the failures, although the measure cannot see grain shape or texture. Possible explanations, none of them tested, are genuine visual similarity between varieties and differences between the start and end of a sitting that average colour does not capture.
 
+### Confidence Scores
+
+`analyze_confidence.py` measures how well a model's confidence tracks whether it is right. On the time-ordered test set (288 images), the model trained on the time-ordered split gave:
+
+| Confidence | Images | Correct | Accuracy |
+|---|---:|---:|---:|
+| below 50% | 14 | 6 | 42.9% |
+| 50-70% | 29 | 13 | 44.8% |
+| 70-90% | 28 | 16 | 57.1% |
+| 90-100% | 217 | 205 | 94.5% |
+
+Mean confidence was 91.0% (95.0% when correct, 71.1% when wrong) against an accuracy of 83.3%, so the model is somewhat overconfident. Confidence is informative: predictions at or above 90% were right 94.5% of the time, and those below 90% (71 images, 24.7% of the test set) only 49.3% of the time. It is not a guarantee: 12 of the 48 errors had a confidence of 90% or more.
+
+These figures describe the model trained on the time-ordered split, not the model currently used by the dashboard (`models/best.pt`), which cannot be evaluated fairly because both test sets overlap with its training data. The test images are consecutive photos from the same sittings, and no labelled aerial footage is available, so the figures do not show how far confidence can be trusted on drone video.
+
 ### Running the Evaluation
 
 Activate the project virtual environment and execute:
@@ -285,6 +300,7 @@ Potential improvements include:
 | `train_rice_classifier.py` | Trains the classifier (`--dataset`, `--run-name`) |
 | `evaluate_rice_classifier.py` | Evaluates a model on a test split (`--model`, `--dataset`, `--name`) |
 | `analyze_test_errors.py` | Per-variety accuracy and most common confusions |
+| `analyze_confidence.py` | Accuracy by confidence level |
 | `check_split_leakage.py` | Measures how similar test images are to training images |
 | `tests/` | Unit and smoke tests: `python -m unittest discover -s tests` |
 
@@ -295,6 +311,7 @@ CropAI/
 ├── train_rice_classifier.py
 ├── evaluate_rice_classifier.py
 ├── analyze_test_errors.py
+├── analyze_confidence.py
 ├── check_split_leakage.py
 ├── clean_rice_dataset.py
 ├── make_time_ordered_split.py
