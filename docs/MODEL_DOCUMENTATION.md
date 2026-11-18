@@ -41,6 +41,8 @@ The dataset contains 33 rice variety classes organized into separate class folde
 
 The dataset is not included in the GitHub repository.
 
+The cleaned dataset was made from the raw `Primitive_Rice_OnField_new` folder (3,299 image files) by `clean_rice_dataset.py`. Images are grouped by content hash: 32 groups of identical images filed under more than one variety (87 files) were quarantined as conflicting labels, 110 further copies of images with a single label were removed as duplicates, and one copy of each remaining image (3,102 in total) was split 80/10/10 per variety with a fixed seed. `audit_original_dataset.py` reports the duplicate counts for the raw data, and `validate_clean_dataset.py` checks the result: every variety appears in every split, no exact duplicate appears in more than one split, and the cleaning manifest matches the files on disk. These checks catch exact duplicates only; see Section 7 for near-duplicates.
+
 A second split of the same images, `datasets/rice_classification_time_split_v2`, was created by `make_time_ordered_split.py` and is described in Section 7:
 
 | Dataset Split | Number of Images |
@@ -295,7 +297,9 @@ Potential improvements include:
 | File | Purpose |
 |---|---|
 | `app.py` | Streamlit dashboard |
+| `audit_original_dataset.py` | Reports duplicate and conflicting-label images in the raw dataset |
 | `clean_rice_dataset.py` | Removes duplicates and conflicting labels from the raw dataset and makes the random split (v1) |
+| `validate_clean_dataset.py` | Checks the cleaned dataset: every variety in every split, no exact duplicates across splits, manifest matches the files |
 | `make_time_ordered_split.py` | Builds the time-ordered split (v2) |
 | `train_rice_classifier.py` | Trains the classifier (`--dataset`, `--run-name`) |
 | `evaluate_rice_classifier.py` | Evaluates a model on a test split (`--model`, `--dataset`, `--name`) |
@@ -313,13 +317,16 @@ CropAI/
 ├── analyze_test_errors.py
 ├── analyze_confidence.py
 ├── check_split_leakage.py
+├── audit_original_dataset.py
 ├── clean_rice_dataset.py
+├── validate_clean_dataset.py
 ├── make_time_ordered_split.py
 ├── models/
 │   └── best.pt
 ├── tests/
 │   ├── test_maturity.py
-│   └── test_model_smoke.py
+│   ├── test_model_smoke.py
+│   └── test_time_split.py
 ├── docs/
 │   ├── MODEL_DOCUMENTATION.md
 │   └── images/
