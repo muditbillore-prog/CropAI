@@ -212,6 +212,14 @@ Mean confidence was 91.0% (95.0% when correct, 71.1% when wrong) against an accu
 
 These figures describe the model trained on the time-ordered split, not the model currently used by the dashboard (`models/best.pt`), which cannot be evaluated fairly because both test sets overlap with its training data. The test images are consecutive photos from the same sittings, and no labelled aerial footage is available, so the figures do not show how far confidence can be trusted on drone video.
 
+### Aerial Video
+
+`compare_models_on_video.py` runs two models on the same frames sampled from a video, as the dashboard does, and reports how often they agree and how confident each is. No labels are needed, so it cannot say which model is right. By default it compares the deployed model with the model trained on the time-ordered split, whose weights come from the training step and are not in the repository.
+
+On three aerial farm clips (10 frames each, 30 frames in total) the two models agreed on only 8 of 30 frames (26.7%): 2 of 10, 6 of 10 and 0 of 10 in the three clips. Mean confidence was 44.9% for the deployed model and 60.2% for the time-ordered model, and 28 and 29 of the 30 frames, respectively, were below 90% confidence.
+
+Two models trained with the same settings on overlapping sets of the same photos gave mostly different varieties for the same frames, and almost every frame was low-confidence for both. Variety predictions for aerial footage should therefore not be relied on. The training photos are close-ups of rice, and no labelled aerial footage is available to check anything further.
+
 ### Running the Evaluation
 
 Activate the project virtual environment and execute:
@@ -305,6 +313,7 @@ Potential improvements include:
 | `evaluate_rice_classifier.py` | Evaluates a model on a test split (`--model`, `--dataset`, `--name`) |
 | `analyze_test_errors.py` | Per-variety accuracy and most common confusions |
 | `analyze_confidence.py` | Accuracy by confidence level |
+| `compare_models_on_video.py` | Compares two models on frames sampled from a video |
 | `check_split_leakage.py` | Measures how similar test images are to training images |
 | `tests/` | Unit and smoke tests: `python -m unittest discover -s tests` |
 
@@ -316,6 +325,7 @@ CropAI/
 ├── evaluate_rice_classifier.py
 ├── analyze_test_errors.py
 ├── analyze_confidence.py
+├── compare_models_on_video.py
 ├── check_split_leakage.py
 ├── audit_original_dataset.py
 ├── clean_rice_dataset.py
