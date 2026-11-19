@@ -1,5 +1,7 @@
 # CropAI — AI-Based Crop Identification and Farm Analysis
 
+[![tests](https://github.com/muditbillore-prog/CropAI/actions/workflows/tests.yml/badge.svg)](https://github.com/muditbillore-prog/CropAI/actions/workflows/tests.yml)
+
 CropAI is an AI-powered application developed to explore rice variety identification using image classification and video analysis.
 
 The project combines computer vision, deep learning and a Streamlit-based interface to process uploaded farm images and videos.
@@ -37,6 +39,18 @@ Developed and tested on Windows 11 with Python 3.12.10. The trained model is inc
     streamlit run app.py
 
 On Linux or macOS, activate the environment with `source .venv/bin/activate` instead. The training dataset is not included in this repository.
+
+## Testing
+
+The repository has 19 automated tests, run with `python -m unittest discover -s tests`. GitHub Actions runs them on every push on a clean Ubuntu machine.
+
+| File | What it covers |
+| --- | --- |
+| `tests/test_maturity.py` | The crop-maturity calculation: stage boundaries, future and past planting dates, decimal durations and the duration limits of the dashboard |
+| `tests/test_model_smoke.py` | The trained model: 33 classes, valid probabilities, a consistent top-5 list, small and non-square images, repeatable predictions |
+| `tests/test_time_split.py` | The time-ordered split planner: block sizes, no second shared between train, validation and test, deterministic output |
+
+The tests use synthetic data, so they need neither the dataset nor a GPU. The model test loads the `models/best.pt` included in the repository.
 
 ## Evaluation Results
 
