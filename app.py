@@ -30,6 +30,11 @@ def load_rice_model():
     return YOLO(MODEL_PATH)
 
 
+def count_low_confidence(confidences_pct, threshold=90.0):
+    """Count the confidence scores (in percent) that are below the threshold."""
+    return sum(1 for value in confidences_pct if value < threshold)
+
+
 def calculate_maturity(planting_date, crop_duration):
     """Calculate a planning estimate using planting date and crop duration."""
     duration_days = int(crop_duration)
@@ -365,9 +370,13 @@ elif page == "Video Analysis":
                     df = pd.DataFrame(predictions)
                     st.session_state["cropai_video_predictions"] = predictions
                     st.session_state["cropai_video_previews"] = previews
-                    a, b = st.columns(2)
+                    low_frames = count_low_confidence([p["Confidence (%)"] for p in predictions])
+                    a, b, c = st.columns(3)
                     a.metric("Frames analysed", len(predictions))
                     b.metric("Most frequent prediction", df["Predicted variety"].value_counts().idxmax())
+                    c.metric("Frames below 90% confidence", f"{low_frames} of {len(predictions)}")
+                    if low_frames * 2 > len(predictions):
+                        st.warning(f"{low_frames} of {len(predictions)} sampled frames were below 90% confidence, so the variety predictions for this video are unreliable. The model was trained on close-up photos of rice, and on aerial footage two models trained the same way mostly disagreed.")
                     st.markdown("### Sampled frame predictions")
                     for item in previews:
                         with st.expander(f"{item['timestamp']:.1f}s — {item['variety']} ({item['confidence']:.2f}%)"):
@@ -460,6 +469,9 @@ elif page == "Rice Variety AI":
                 <div style="color:white;font-size:28px;font-weight:700;margin:8px 0">{best_name}</div>
                 <div style="color:#d7f5df;font-size:16px">Model confidence: {best_confidence:.2f}%</div></div>
                 """, unsafe_allow_html=True)
+
+                if count_low_confidence([best_confidence]):
+                    st.warning(f"Low confidence ({best_confidence:.1f}%). Treat this variety as uncertain: in a test of a model trained the same way, predictions below 90% confidence were right only about half the time.")
 
                 report_rows = []
                 st.markdown("#### Top 5 possible varieties")
