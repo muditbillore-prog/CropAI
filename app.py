@@ -30,6 +30,16 @@ def load_rice_model():
     return YOLO(MODEL_PATH)
 
 
+def load_uploaded_image(uploaded_file):
+    """Open an uploaded image as RGB, or raise ValueError with a message that is safe to show."""
+    try:
+        return Image.open(uploaded_file).convert("RGB")
+    except OSError as error:
+        raise ValueError(
+            "This file could not be read as an image. Please upload a JPG, PNG or WEBP photo."
+        ) from error
+
+
 def count_low_confidence(confidences_pct, threshold=90.0):
     """Count the confidence scores (in percent) that are below the threshold."""
     return sum(1 for value in confidences_pct if value < threshold)
@@ -441,7 +451,7 @@ elif page == "Rice Variety AI":
     uploaded_image = st.file_uploader("Upload a rice image", type=["jpg", "jpeg", "png", "webp"], key="rice_variety_image")
     if uploaded_image is not None:
         try:
-            image = Image.open(uploaded_image).convert("RGB")
+            image = load_uploaded_image(uploaded_image)
             st.image(image, caption="Uploaded rice image", use_container_width=True)
             st.markdown("### 🌱 Crop Growth & Maturity")
             col1, col2 = st.columns(2)
