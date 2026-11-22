@@ -321,6 +321,7 @@ Potential improvements include:
 CropAI/
 ├── app.py
 ├── requirements.txt
+├── LICENSE
 ├── train_rice_classifier.py
 ├── evaluate_rice_classifier.py
 ├── analyze_test_errors.py
@@ -331,12 +332,17 @@ CropAI/
 ├── clean_rice_dataset.py
 ├── validate_clean_dataset.py
 ├── make_time_ordered_split.py
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 ├── models/
 │   └── best.pt
 ├── tests/
 │   ├── test_maturity.py
 │   ├── test_model_smoke.py
-│   └── test_time_split.py
+│   ├── test_time_split.py
+│   ├── test_low_confidence.py
+│   └── test_image_loading.py
 ├── docs/
 │   ├── MODEL_DOCUMENTATION.md
 │   └── images/

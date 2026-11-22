@@ -42,13 +42,15 @@ On Linux or macOS, activate the environment with `source .venv/bin/activate` ins
 
 ## Testing
 
-The repository has 19 automated tests, run with `python -m unittest discover -s tests`. GitHub Actions runs them on every push on a clean Ubuntu machine.
+The repository has 29 automated tests, run with `python -m unittest discover -s tests`. GitHub Actions runs them on every push on a clean Ubuntu machine.
 
 | File | What it covers |
 | --- | --- |
 | `tests/test_maturity.py` | The crop-maturity calculation: stage boundaries, future and past planting dates, decimal durations and the duration limits of the dashboard |
 | `tests/test_model_smoke.py` | The trained model: 33 classes, valid probabilities, a consistent top-5 list, small and non-square images, repeatable predictions |
 | `tests/test_time_split.py` | The time-ordered split planner: block sizes, no second shared between train, validation and test, deterministic output |
+| `tests/test_low_confidence.py` | The dashboard's low-confidence rule: the 90% boundary, empty input and custom thresholds |
+| `tests/test_image_loading.py` | Opening uploaded images: colour and grayscale photos, and clear errors for text, empty and truncated files |
 
 The tests use synthetic data, so they need neither the dataset nor a GPU. The model test loads the `models/best.pt` included in the repository.
 
@@ -84,6 +86,10 @@ Full methodology, the overlap analysis and the training configuration are in [do
 - Video analysis works on sampled frames and is not a field-level survey. On aerial footage the variety predictions are unreliable: two models trained the same way agreed on only 8 of 30 sampled frames, and almost every frame was below 90% confidence.
 - Each variety was photographed in one short sitting, so all reported accuracy measures performance on similar photos, not on other fields, cameras, lighting or growth stages. The original 99.07% result also overlaps with the training photos; see Evaluation Results.
 - Model confidence scores are predictions, not guarantees of real-world accuracy.
+
+## License
+
+The code in this repository is released under the [MIT License](LICENSE). The rice photos used for training are not included in this repository and remain subject to their own terms.
 
 ## Development Status
 
