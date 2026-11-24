@@ -1,27 +1,11 @@
-"""Tests for count_low_confidence in app.py, the dashboard's low-confidence rule.
-
-The function is read out of app.py without importing it, because importing the
-dashboard would start Streamlit.
-"""
-import ast
+"""Tests for count_low_confidence in cropai_helpers.py, the dashboard's low-confidence rule."""
+import sys
 import unittest
 from pathlib import Path
 
-APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-
-def _load_count_low_confidence():
-    tree = ast.parse(APP_PATH.read_text(encoding="utf-8"))
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name == "count_low_confidence":
-            module = ast.Module(body=[node], type_ignores=[])
-            namespace = {}
-            exec(compile(module, str(APP_PATH), "exec"), namespace)
-            return namespace["count_low_confidence"]
-    raise AssertionError("count_low_confidence not found in app.py")
-
-
-count_low_confidence = _load_count_low_confidence()
+from cropai_helpers import count_low_confidence  # noqa: E402
 
 
 class CountLowConfidenceTests(unittest.TestCase):

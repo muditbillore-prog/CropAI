@@ -1,15 +1,18 @@
-"""Tests for calculate_maturity in app.py.
+"""Tests for calculate_maturity in cropai_helpers.py.
 
-The function is read out of app.py and run with a fixed "today" so results do
-not change from day to day. Importing app.py directly would start the Streamlit
-dashboard, so it is not imported here.
+"Today" is fixed (the date used inside the helper is patched), so the results
+do not change from day to day.
 """
-import ast
 import datetime
+import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
-APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import cropai_helpers  # noqa: E402
+
 TODAY = datetime.date(2026, 6, 1)
 
 
@@ -19,18 +22,9 @@ class _FixedDate(datetime.date):
         return TODAY
 
 
-def _load_calculate_maturity():
-    tree = ast.parse(APP_PATH.read_text(encoding="utf-8"))
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name == "calculate_maturity":
-            module = ast.Module(body=[node], type_ignores=[])
-            namespace = {"date": _FixedDate, "timedelta": datetime.timedelta}
-            exec(compile(module, str(APP_PATH), "exec"), namespace)
-            return namespace["calculate_maturity"]
-    raise AssertionError("calculate_maturity not found in app.py")
-
-
-calculate_maturity = _load_calculate_maturity()
+def calculate_maturity(planting_date, crop_duration):
+    with mock.patch.object(cropai_helpers, "date", _FixedDate):
+        return cropai_helpers.calculate_maturity(planting_date, crop_duration)
 
 
 def planted(days_ago):

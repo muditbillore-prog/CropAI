@@ -1,31 +1,15 @@
-"""Tests for load_uploaded_image in app.py, which opens images uploaded in the dashboard.
-
-The function is read out of app.py without importing it, because importing the
-dashboard would start Streamlit.
-"""
-import ast
+"""Tests for load_uploaded_image in cropai_helpers.py, which opens images uploaded in the dashboard."""
 import io
+import sys
 import unittest
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
-APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-
-def _load_function():
-    tree = ast.parse(APP_PATH.read_text(encoding="utf-8"))
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name == "load_uploaded_image":
-            module = ast.Module(body=[node], type_ignores=[])
-            namespace = {"Image": Image}
-            exec(compile(module, str(APP_PATH), "exec"), namespace)
-            return namespace["load_uploaded_image"]
-    raise AssertionError("load_uploaded_image not found in app.py")
-
-
-load_uploaded_image = _load_function()
+from cropai_helpers import load_uploaded_image  # noqa: E402
 
 
 def png_bytes(array):

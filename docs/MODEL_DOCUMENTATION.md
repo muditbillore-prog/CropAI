@@ -305,6 +305,7 @@ Potential improvements include:
 | File | Purpose |
 |---|---|
 | `app.py` | Streamlit dashboard |
+| `cropai_helpers.py` | Small tested helpers used by the dashboard: maturity estimate, low-confidence rule, safe image loading |
 | `audit_original_dataset.py` | Reports duplicate and conflicting-label images in the raw dataset |
 | `clean_rice_dataset.py` | Removes duplicates and conflicting labels from the raw dataset and makes the random split (v1) |
 | `validate_clean_dataset.py` | Checks the cleaned dataset: every variety in every split, no exact duplicates across splits, manifest matches the files |
@@ -320,6 +321,7 @@ Potential improvements include:
 ```text
 CropAI/
 ├── app.py
+├── cropai_helpers.py
 ├── requirements.txt
 ├── LICENSE
 ├── train_rice_classifier.py
