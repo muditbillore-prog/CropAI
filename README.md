@@ -42,7 +42,7 @@ On Linux or macOS, activate the environment with `source .venv/bin/activate` ins
 
 ## Testing
 
-The repository has 29 automated tests, run with `python -m unittest discover -s tests`. GitHub Actions runs them on every push on a clean Ubuntu machine.
+The repository has 29 automated tests, run with `python -m unittest discover -s tests`. GitHub Actions runs them on a clean Ubuntu machine on every push to `main` and on every pull request.
 
 | File | What it covers |
 | --- | --- |
@@ -83,7 +83,7 @@ Full methodology, the overlap analysis and the training configuration are in [do
 
 - CropAI classifies the rice variety shown in an image. It does not detect individual plants.
 - It does not diagnose crop disease or provide a validated crop-health score.
-- Video analysis works on sampled frames and is not a field-level survey. On aerial footage the variety predictions are unreliable: two models trained the same way agreed on only 8 of 30 sampled frames, and almost every frame was below 90% confidence.
+- Video analysis works on sampled frames and is not a field-level survey. On aerial footage the variety predictions are unreliable: the deployed model and the time-ordered model agreed on only 8 of 30 sampled frames, and almost every frame was below 90% confidence.
 - Each variety was photographed in one short sitting, so all reported accuracy measures performance on similar photos, not on other fields, cameras, lighting or growth stages. The original 99.07% result also overlaps with the training photos; see Evaluation Results.
 - Model confidence scores are predictions, not guarantees of real-world accuracy.
 

@@ -86,6 +86,8 @@ The configured training parameters are:
 | Patience | 5 |
 | Random Seed | 42 |
 
+Training starts from the pretrained `yolo11n-cls.pt` weights. The original run (`rice_variety_clean_v1`) ended after 12 of the 20 epochs (733 s on the CPU): validation Top-1 first reached 99.669% at epoch 7 and did not improve in the next five epochs, which matches the patience setting of 5. The run on the time-ordered split is described in Section 7.
+
 The training script checks the dataset directories and class-folder consistency before starting training.
 
 It also prevents accidental overwriting of an existing training run.
@@ -296,7 +298,7 @@ Potential improvements include:
 
 - Testing with more real-world field images and videos.
 - Improving robustness under different lighting and environmental conditions.
-- Analyzing class-wise errors and improving difficult classifications.
+- Investigating why five varieties are mostly mistaken for one other variety each (documented above; the cause is not yet known) and improving them.
 - Exploring crop-health analysis as a separate, properly validated capability.
 - Expanding the dataset with additional rice varieties.
 
