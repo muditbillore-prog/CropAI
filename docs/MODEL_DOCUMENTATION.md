@@ -253,6 +253,9 @@ The CropAI dashboard currently supports:
 - Prediction confidence scores.
 - CSV report generation.
 - Maturity planning calculations.
+- A low-confidence notice on the image page (confidence below 90%).
+- On the video page, a "Frames below 90% confidence" metric and a warning when more than half of the sampled frames are below 90%.
+- Clear error messages for unreadable images and unreadable video frames.
 
 The model classifies the most likely rice variety in the input image. Its confidence score should not be treated as a guarantee of correctness.
 
@@ -287,6 +290,7 @@ streamlit run app.py
 - Classification performance depends on image quality, lighting, camera angle, and dataset coverage.
 - The model predicts a rice variety; it does not identify individual plants.
 - The application does not currently provide validated crop-health diagnosis.
+- Video analysis works on sampled frames and is not a field-level survey. On aerial footage the variety predictions are unreliable: the deployed model and the time-ordered model agreed on only 8 of 30 sampled frames, and 28 or 29 of 30 frames were below 90% confidence for the two models.
 - Confidence scores are model estimates, not guaranteed probabilities of correctness.
 - The original test split overlaps with the training split (near-identical photos from the same sittings), so its 99.07% result overstates performance on new photos. The stricter time-ordered result is 83.33% Top-1.
 - Each variety was photographed in one short sitting, according to file-name timestamps, so neither evaluation measures performance on other days, fields, cameras or lighting. A truly independent test set would need new photographs.
