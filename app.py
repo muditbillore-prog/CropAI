@@ -344,7 +344,7 @@ elif page == "Video Analysis":
                     b.metric("Most frequent prediction", df["Predicted variety"].value_counts().idxmax())
                     c.metric("Frames below 90% confidence", f"{low_frames} of {len(predictions)}")
                     if low_frames * 2 > len(predictions):
-                        st.warning(f"{low_frames} of {len(predictions)} sampled frames were below 90% confidence, so the variety predictions for this video are unreliable. The model was trained on close-up photos of rice, and on aerial footage two models trained the same way mostly disagreed.")
+                        st.warning(f"{low_frames} of {len(predictions)} sampled frames were below 90% confidence, so the variety predictions for this video are unreliable. The model was trained on close-up photos of rice, and on aerial footage the deployed model and the time-ordered model mostly disagreed.")
                     st.markdown("### Sampled frame predictions")
                     for item in previews:
                         with st.expander(f"{item['timestamp']:.1f}s — {item['variety']} ({item['confidence']:.2f}%)"):
@@ -439,7 +439,7 @@ elif page == "Rice Variety AI":
                 """, unsafe_allow_html=True)
 
                 if count_low_confidence([best_confidence]):
-                    st.warning(f"Low confidence ({best_confidence:.1f}%). Treat this variety as uncertain: in a test of a model trained the same way, predictions below 90% confidence were right only about half the time.")
+                    st.warning(f"Low confidence ({best_confidence:.1f}%). Treat this variety as uncertain: in the stricter time-ordered test, predictions below 90% confidence were right only about half the time.")
 
                 report_rows = []
                 st.markdown("#### Top 5 possible varieties")
