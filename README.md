@@ -13,6 +13,8 @@ The application is designed to:
 - Analyse uploaded farm videos using sampled frames.
 - Generate prediction summaries and downloadable CSV reports.
 - Display model confidence scores for predicted rice varieties.
+- Plan crop maturity from a planting date and expected duration.
+- Warn when a prediction has low confidence, or when an image or video frame cannot be read.
 
 ## Technology Stack
 
